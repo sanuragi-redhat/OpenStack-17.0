@@ -233,8 +233,43 @@ After a successful deployment, you can use the clouds.yaml configuration file in
     
     [stack@all-in-one]$ export OS_CLOUD=standalone
     [stack@all-in-one]$ openstack endpoint list
-    
-To access the dashboard, go to to http://192.168.25.2/dashboard and use the default username admin and the password from the $HOME/config/openstack/clouds.yaml file:
+    [stack@allinone ~]$ sudo iptables -t nat -A PREROUTING -p tcp -i ens34 --dport 80 -j DNAT --to-destination 192.168.25.3:80
+    [stack@allinone ~]$ sudo iptables -A FORWARD -p tcp -d 192.168.25.3 --dport 80 -j ACCEPT
+    [root@allinone ~]# ip a
+    1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
+        link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+        inet 127.0.0.1/8 scope host lo
+           valid_lft forever preferred_lft forever
+        inet6 ::1/128 scope host 
+           valid_lft forever preferred_lft forever
+    2: ens34: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq state UP group default qlen 1000
+        link/ether 00:0c:29:8c:59:94 brd ff:ff:ff:ff:ff:ff
+        altname enp2s2
+        inet 192.168.0.182/24 brd 192.168.0.255 scope global dynamic noprefixroute ens34
+           valid_lft 77028sec preferred_lft 77028sec
+        inet6 fe80::20c:29ff:fe8c:5994/64 scope link noprefixroute 
+           valid_lft forever preferred_lft forever
+    3: ens37: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq master ovs-system state UP group default qlen 1000
+        link/ether 00:0c:29:8c:59:9e brd ff:ff:ff:ff:ff:ff
+        altname enp2s5
+        inet6 fe80::20c:29ff:fe8c:599e/64 scope link 
+           valid_lft forever preferred_lft forever
+    4: ovs-system: <BROADCAST,MULTICAST> mtu 1500 qdisc noop state DOWN group default qlen 1000
+        link/ether c6:38:7d:53:49:9e brd ff:ff:ff:ff:ff:ff
+    5: br-ctlplane: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UNKNOWN group default qlen 1000
+        link/ether 00:0c:29:8c:59:9e brd ff:ff:ff:ff:ff:ff
+        inet 192.168.25.2/24 brd 192.168.25.255 scope global br-ctlplane
+           valid_lft forever preferred_lft forever
+        inet 192.168.25.2/32 brd 192.168.25.2 scope global br-ctlplane
+           valid_lft forever preferred_lft forever
+        inet 192.168.25.3/32 brd 192.168.25.255 scope global br-ctlplane
+           valid_lft forever preferred_lft forever
+        inet6 fe80::20c:29ff:fe8c:599e/64 scope link 
+           valid_lft forever preferred_lft forever
+    6: br-int: <BROADCAST,MULTICAST> mtu 1500 qdisc noop state DOWN group default qlen 1000
+        link/ether d2:20:23:ee:6d:fc brd ff:ff:ff:ff:ff:ff
+
+To access the dashboard, go to to http://192.168.25.2/dashboard or http://192.168.0.182/dashboard and use the default username admin and the password from the $HOME/config/openstack/clouds.yaml file:
 
     [stack@all-in-one]$ cat $HOME/.config/openstack/clouds.yaml | grep password:
 
