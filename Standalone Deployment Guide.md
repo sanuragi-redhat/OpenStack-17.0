@@ -157,25 +157,65 @@ Create the $HOME/standalone_parameters.yaml file and configure basic parameters 
     [stack@all-in-one]$ export DNS1=1.1.1.1
     [stack@all-in-one]$ export DNS2=8.8.8.8
     
-    [stack@all-in-one]$ cat <<EOF > $HOME/standalone_parameters.yaml
-    parameter_defaults:
-      CloudName: $IP
-      CloudDomain: localdomain
-      ControlPlaneStaticRoutes: []
-      Debug: true
-      DeploymentUser: $USER
-      KernelIpNonLocalBind: 1
-      DockerInsecureRegistryAddress:
-        - $IP:8787
-      NeutronPublicInterface: $INTERFACE
-      NeutronDnsDomain: localdomain
-      NeutronBridgeMappings: datacentre:br-ctlplane
-      NeutronPhysicalBridge: br-ctlplane
-      StandaloneEnableRoutedNetworks: false
-      StandaloneHomeDir: $HOME
-      StandaloneLocalMtu: 1500
-    EOF
+    [stack@allinone ~]$ cat containers-prepare-parameters.yaml 
+    # Generated with the following on 2026-10-12T23:50:13.514388
+    #
+    #   openstack tripleo container image prepare default --output-env-file /home/stack/containers-prepare-parameters.yaml
+    #
     
+    parameter_defaults:
+      ContainerImagePrepare:
+      - set:
+          ceph_alertmanager_image: ose-prometheus-alertmanager
+          ceph_alertmanager_namespace: registry.redhat.io/openshift4
+          ceph_alertmanager_tag: 4.6
+          ceph_grafana_image: rhceph-5-dashboard-rhel8
+          ceph_grafana_namespace: registry.redhat.io/rhceph
+          ceph_grafana_tag: latest
+          ceph_image: rhceph-5-rhel8
+          ceph_namespace: registry.redhat.io/rhceph
+          ceph_node_exporter_image: ose-prometheus-node-exporter
+          ceph_node_exporter_namespace: registry.redhat.io/openshift4
+          ceph_node_exporter_tag: v4.6
+          ceph_prometheus_image: ose-prometheus
+          ceph_prometheus_namespace: registry.redhat.io/openshift4
+          ceph_prometheus_tag: 4.6
+          ceph_tag: latest
+          name_prefix: openstack-
+          name_suffix: ''
+          namespace: registry.redhat.io/rhosp-rhel9
+          neutron_driver: ovn
+          rhel_containers: false
+          tag: '17.0'
+        tag_from_label: '{version}-{release}'
+      ContainerImageRegistryCredentials:
+        registry.redhat.io:
+          rhaccount: "rhpass"
+      ContainerImageRegistryLogin: true
+     
+     [stack@allinone ~]$ cat standalone_parameters.yaml 
+     parameter_defaults:
+       CloudName: 192.168.25.2
+       CloudDomain: localdomain
+       ControlPlaneStaticRoutes: 
+       - ip_netmask: 0.0.0.0/0
+         next_hop: $GATEWAY
+         default: true
+       Debug: true
+       DeploymentUser: stack
+       KernelIpNonLocalBind: 1
+       DockerInsecureRegistryAddress:
+         - 192.168.25.2:8787
+       NeutronPublicInterface: ens37
+       NeutronDnsDomain: localdomain
+       NeutronBridgeMappings: datacentre:br-ctlplane
+       NeutronPhysicalBridge: br-ctlplane
+       StandaloneEnableRoutedNetworks: false
+       StandaloneHomeDir: /home/stack
+       StandaloneLocalMtu: 1500
+       NovaComputeLibvirtType: qemu
+
+
 If you use only a single network interface, you must define the default route:
     
     ControlPlaneStaticRoutes:
